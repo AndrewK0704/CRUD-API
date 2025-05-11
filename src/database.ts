@@ -6,8 +6,14 @@ type User = {
 };
 
 export const usersDB: User[] = [{
-  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "id": "22222222-0000-12d3-a456-426614174000",
   "age": 25,
   "hobbies": ["fly"],
   "username": "Alex"
+},
+{
+  "id": "11111111-0000-12d3-a456-426614174000",
+  "age": 30,
+  "hobbies": ["music"],
+  "username": "Anton"
 }]
