@@ -1,0 +1,21 @@
+type User = {
+  id?: string;
+  username: string;
+  age: number;
+  hobbies: string[];
+};
+
+export const usersDB: User[] = [
+  {
+    id: '22222222-0000-12d3-a456-426614174000',
+    username: 'Alex',
+    age: 25,
+    hobbies: ['fly'],
+  },
+  {
+    id: '11111111-0000-12d3-a456-426614174000',
+    username: 'Anton',
+    age: 30,
+    hobbies: ['music'],
+  },
+];
