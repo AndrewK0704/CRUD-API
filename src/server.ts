@@ -78,6 +78,45 @@ const server = http.createServer((req:any, res:ServerResponse) => {
             res.end(JSON.stringify({ error: "Server Error" }));
         }
     }
+    const putUser = async () => {
+        let body = "";
+            const parsePost = async () =>{
+                req.on("data", (chunk: any) => {
+                    body += chunk.toString();
+                });
+                req.on("end", () => {
+                   body = JSON.parse(body);
+                });
+            }
+            await parsePost();
+
+        let bodyNew=JSON.parse(body);
+        console.log(bodyNew);
+        try {
+            if (uuidValidate(id)) {
+            const user = usersDB.find((user) => user.id === id);
+                if (!user) {
+                    res.writeHead(404, { "Content-Type": "application/json" });
+                    res.write(JSON.stringify({ message: "User not found" }));
+                    res.end();
+                } else {
+                    user['username']=bodyNew.username;
+                    user['age']=bodyNew.age;
+                    user['hobbies']=bodyNew.hobbies;                   
+                    res.writeHead(200, { "Content-Type": "application/json" });
+                    res.write(JSON.stringify(user));
+                    res.end();
+                }
+            } else {
+            res.writeHead(400, { "Content-Type": "application/json" });
+            res.write(JSON.stringify({ message: "not uuid" }));
+            res.end();
+            }
+        } catch (error) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Server error" }));
+        }        
+    }
 
     const deleteUser = async (id:string) => {
         try {
@@ -118,8 +157,14 @@ const server = http.createServer((req:any, res:ServerResponse) => {
 
     } else if (req.method === 'POST'){
         postUser();
+    } else if (req.method === 'PUT'){
+        if(req.url.split("/")[1]==='api' && req.url.split("/")[2]==='users' && req.url.split("/")[3]!=='' && !req.url.split("/")[4]){
+            putUser();
+        } else {
+            res.writeHead(404, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Page not found" }));
+        }
     } else if (req.method === 'DELETE'){
-
         if(req.url.split("/")[1]==='api' && req.url.split("/")[2]==='users' && req.url.split("/")[3]!=='' && !req.url.split("/")[4]){
             deleteUser(id);
         } else {
