@@ -2,6 +2,7 @@ import http, { ServerResponse } from 'http';
 import dotenv from 'dotenv';
 import {usersDB} from './database';
 import { validate as uuidValidate } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 dotenv.config();
 const PORT = process.env.PORT || 4000;
@@ -44,6 +45,40 @@ const server = http.createServer((req:any, res:ServerResponse) => {
         }
     }
 
+    const postUser = async () => {
+        try {
+            let body = "";
+            const parsePost = async () =>{
+                req.on("data", (chunk: any) => {
+                    body += chunk.toString();
+                });
+                req.on("end", () => {
+                   body = JSON.parse(body);
+                });
+            }
+            await parsePost();
+
+            let bodyNew=JSON.parse(body);
+
+            if (bodyNew.username && bodyNew.age && bodyNew.hobbies) {
+                let obj: any = {};
+                obj['username']=bodyNew.username;
+                obj['age']=bodyNew.age;
+                obj['hobbies']=bodyNew.hobbies;
+                obj['id']=uuidv4();
+                usersDB.push(obj);
+                res.writeHead(201, { "Content-Type": "application/json" });
+                res.end();
+            } else {
+                res.writeHead(400, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ error: "Missing required fields" }));
+            }
+        } catch (error) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Server Error" }));
+        }
+    }
+
     const deleteUser = async (id:string) => {
         try {
             if (uuidValidate(id)) {
@@ -81,6 +116,8 @@ const server = http.createServer((req:any, res:ServerResponse) => {
             res.end(JSON.stringify({ error: "Page not found" }));
         }
 
+    } else if (req.method === 'POST'){
+        postUser();
     } else if (req.method === 'DELETE'){
 
         if(req.url.split("/")[1]==='api' && req.url.split("/")[2]==='users' && req.url.split("/")[3]!=='' && !req.url.split("/")[4]){
